@@ -1,0 +1,98 @@
+Para que dois Containers distintos se comuniquem, precisamos colocá-los na mesma Network. Após criados os dois Containers com seus respectivos conteúdos, podemos atingir de um ao outro com alguns comandos específicos. Para o nosso caso, usaremos o curl.
+
+*OBS*: O manual abaixo, foi feito para execução em ambiente Windows
+
+CRIAÇÃO CONTAINER - SERVIDOR
+
+1. Abrir o terminal (CMD) 
+
+2 . Via terminal, entrar no diretório destinado ao container que será criado (dica: Se estiver dentro da pasta do User no Windows, é só colocar cd ~~nome da pasta~~/dockerservidor)
+
+2. Dentro do diretório do futuro container, instalar dependências que iremos precisar no projeto. No nosso caso, executar os dois comandos abaixo:
+npm install koa
+npm install nodemon -D
+(OBS: Não foi possível subir no git a versão já com os pacotes instalados devido ao limite de pastas)
+
+3. Criar o arquivo que se deseja colocar no docker (no nosso caso, já está criado o componenteServ.js)
+
+4. Criar um arquivo chamado dockerfile, que terá instruções para que o docker consiga criar a imagem (no nosso caso, ele já existe)
+
+5. Criar a imagem/buildar projeto. No nosso caso, execute o comando abaixo:
+docker build . -t imagemservidor'
+
+6. Criar o container da imagem buildada. No nosso caso, execute o comando abaixo:
+docker run --name containerserver -p 3000:3000 -v "%cd%:/home/node/app" imagemservidor
+
+EXTRA: Se nesse momento abrirmos nosso browser e digitarmos 'localhost:3000', será apresentado o conteúdo do arquivo componenteServ.js
+
+
+CRIAÇÃO CONTAINER - CLIENTE
+
+1. Abrir o terminal (CMD) 
+
+2. Via terminal (CMD), entrar no diretório destinado ao container que será criado (dica: Se estiver dentro da pasta do User no Windows, é só colocar cd ~~nome da pasta~~/dockerclient)
+
+3. Criar o arquivo que se deseja colocar no docker (no nosso caso, já está criado o callServer.html)
+
+4. Criar um arquivo chamado dockerfile, que terá instruções para que o docker consiga criar a imagem (no nosso caso, ele já existe)
+
+5. Criar a imagem/buildar projeto. No nosso caso, execute o comando abaixo:
+docker build . -t imagemclient
+
+6. Criar o container da imagem buildada. No nosso caso, execute o comando abaixo:
+docker run -d -p 3100:3100 --name containerclient imagemclient
+
+
+CRIAÇÃO NETWORK
+
+1. Abrir o terminal (CMD)
+
+2. Criar e configurar network que irá conter Containers que irão se comunicar. Execute o comando abaixo: 
+docker network create redecontainers --driver bridge
+
+3. Colocar containers na network. Execute os comandos abaixo:
+docker network connect redecontainers containerserver
+docker network connect redecontainers containerclient
+
+OBS: Nesse momento, já temos os dois containers criados, e ambos estão na mesma network que está em modo bridge (ou seja, permite a conexão entre dois roteadores).
+
+MONTAGEM DO SCRIPT E EXECUÇÃO DO TESTE
+
+1. Agora, acessamos o container que queremos utilizar (no nosso caso, containerclient).
+  1. Em Windows, podemos fazer da seguinte forma:
+	Na guia 'Containers/Apps' do Docker, colocamos o mouse em cima do containerclient e clicamos no segundo ícone que irá aparecer (CLI).
+  2. Via terminal, seja em Linux ou Windows, executamos o seguinte comando:
+	docker exec -it ~~id do container~~/bin/sh
+		OBS: Para descobrirmos o ID do container, podemos executar o comando 'docker ps'
+
+2. Provavelmente, o nosso container client ainda não possui o curl (que é o comando que iremos utilizar para acessar o outro container) e o vi ou o vim (editor) instalados. Portanto, após executar o passo anterior, execute os seguintes comandos:
+apt-get update
+apt-get -y install curl
+apt-get -y install vim
+
+3. Agora, iremos criar um script que irá acessar o nosso servidor. Para isso, digitamos:
+vi contatoServidor.sh
+
+4. Nesse momento, estamos dentro do arquivo contatoServidor.sh. Então, agora, iremos montar o nosso script. Para isso:
+	1. Pressionamos 'Insert' no nosso teclado
+	2. Montamos o nosso script. No caso, o conteúdo completo dele será:
+*************************************************************
+#!/bin/bash
+#armazenamos o retorno da chamada para o servidor em uma variável:
+conteudoServidor=$(curl http://containerserver:3000) 
+
+#pegamos a data do servidor, apenas uma gracinha
+dia=$(date +%d/%m/%y) 
+
+#armazenamos a 4a palavra do que foi retornado do curl e, em seguida, pegamos apenas as 8 primeiras letras
+txtmanipulado=$(echo ${conteudoServidor} | cut -d " " -f 4 | cut -c1-8) 
+
+echo "Esta mensagem esta vindo do $txtmanipulado no dia $dia"
+*************************************************************
+
+5. Agora, iremos tornar nosso script executável. Para isso, digitamos:
+chmod +x contatoServidor.sh
+
+6. Após isso, executamos nosso script. Para isso, digitamos:
+./contatoServidor.sh
+

@@ -1,0 +1,61 @@
+Para uma descrição mais aprofundada e menos técnica sobre os passos que estão sendo tomados, acesse o arquivo LEIAME_detalhado.txt
+
+*OBS*: O manual abaixo, foi feito para execução em ambiente Windows
+
+Criação do Container - Servidor
+1. Abrir o terminal (CMD)
+2. Via terminal, entrar no diretório destinado ao container que será criado para o servidor
+3. Digite os comandos abaixo de forma sequencial
+- npm install koa
+- npm install nodemon -D
+- docker build . -t imagemservidor
+- docker run --name containerserver -p 3000:3000 -v "%cd%:/home/node/app" imagemservidor
+
+Criação do Container - Cliente
+1. Abrir o terminal (CMD)
+2. Via terminal, entrar no diretório destinado ao container que será criado para o cliente
+3. Digite os comandos abaixo de forma sequencial
+- docker build . -t imagemclient
+- docker run -d -p 3100:3100 --name containerclient imagemclient
+
+Criação da Network
+1. Abrir o terminal
+2. Digite os comandos abaixo de forma sequencial
+- docker network create redecontainers --driver bridge
+- docker network connect redecontainers containerserver
+- docker network connect redecontainers containerclient
+
+Montagem do Script e execução do teste
+
+1. Nesse momento, precisamos descobrir o ID do nosso container. Para isso, execute o comando abaixo e encontre a linha 'imagemclient'
+- docker ps
+
+2. Copie o código que aparece antes de 'imagemclient'
+
+3. Execute o comando abaixo:
+- docker exec -it ~~id do container~~/bin/sh
+
+4. Provavelmente, o nosso container ainda não possui o curl e o vi instalados. Portanto, após executar o passo anterior, execute os seguintes comandos:
+- apt-get update
+- apt-get -y install curl
+- apt-get -y install vim
+
+5. Criamos o script que irá acessar o nosso servidor:
+vi contatoServidor.sh
+
+6. Pressionamos 'Insert' e, dentro da tela que foi aberta, colocamos o seguinte conteúdo:
+**************
+#!/bin/bash
+
+conteudoServidor=$(curl http://containerserver:3000) 
+dia=$(date +%d/%m/%y) 
+txtmanipulado=$(echo ${conteudoServidor} | cut -d " " -f 4 | cut -c1-8) 
+
+echo "Esta mensagem esta vindo do $txtmanipulado no dia $dia"
+**************
+
+7. Tornamos nosso script executável:
+chmod +x contatoServidor.sh
+
+8. Executamos nosso script:
+./contatoServidor.sh

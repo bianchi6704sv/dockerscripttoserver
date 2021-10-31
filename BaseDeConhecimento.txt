@@ -1,0 +1,9 @@
+O Docker tem a finalidade centralizar aplicações, retirando a necessidade da criação de diversas máquinas virtuais (que funcionam como servidores) para que tenhamos diversas máquinas virtuais para diversas aplicações, economizando recursos, retirando problemas relacionados a versões/pacotes e facilitando o gerenciamento. Os links abaixo possuem diversas informações e possuem uma boa didática, que pode muito bem ser utilizada para aprender docker e suas características:
+https://blog.geekhunter.com.br/docker-na-pratica-como-construir-uma-aplicacao/
+https://www.tutorialworks.com/containers/
+https://blog.geekhunter.com.br/docker-na-pratica-como-construir-uma-aplicacao/
+https://www.youtube.com/watch?v=c6Ord0GAOp8&ab_channel=Simplilearn
+https://www.youtube.com/watch?v=y_XFIidjtEs&ab_channel=knownosing
+https://levelup.gitconnected.com/how-to-access-a-docker-container-from-another-container-656398c93576
+https://www.linkapi.solutions/blog/construindo-um-ambiente-node-js-com-docker
+https://www.youtube.com/watch?v=SyvU4fOVpp0&ab_channel=MateusMuller
