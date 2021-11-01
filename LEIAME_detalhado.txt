@@ -89,6 +89,7 @@ txtmanipulado=$(echo ${conteudoServidor} | cut -d " " -f 4 | cut -c1-8)
 
 echo "Esta mensagem esta vindo do $txtmanipulado no dia $dia"
 *************************************************************
+OBS: Para salvar o arquivo e sair, pressionamos 'ESC', seguido de :x, seguido de 'ENTER'
 
 5. Agora, iremos tornar nosso script executável. Para isso, digitamos:
 chmod +x contatoServidor.sh
